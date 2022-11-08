@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+
 const app = express();
 
 //MIDDLEWARES
@@ -34,5 +35,4 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter); //middleware
 app.use('/api/v1/users', userRouter); //middleware
 app.use(express.static(`${__dirname}/public`));
-
 module.exports = app;

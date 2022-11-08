@@ -5,6 +5,23 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`) //se lee los datos que están en el archivo de texto y se transforman a formato JSON
 );
 
+exports.checkID = (req, res, next, val) => {
+  console.log(`Tour id is: ${val}`);
+  //Param middleware para hacer chequeo del ID válido
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' }); //Es importante el return para cortar la ejecución de la función y que no ejecute el next()
+  }
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res
+      .status(400)
+      .json({ status: 'failed', message: 'Missing name or price' });
+  }
+  next();
+};
 exports.getAllTours = (req, res) => {
   //La función callback se llama Route Handler
   res
@@ -17,9 +34,6 @@ exports.getTour = (req, res) => {
   const id = req.params.id * 1; //transformamos el id que viene por params(que es un string), en un número
   const tour = tours.find((el) => el.id === id);
   //   if (id > tours.length) {
-  if (!tour) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  }
 
   res.status(200).json({ status: 'success', data: { tour } });
 };
@@ -39,17 +53,11 @@ exports.createTour = (req, res) => {
   );
 };
 exports.updateTour = (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  }
   res
     .status(200)
     .json({ status: 'success', data: { tour: '<Updated tour here...>' } });
 };
 exports.deleteTour = (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  }
   res
     .status(204) //204 significa "no content"
     .json({ status: 'success', data: null }); // ya no enviamos datos sino que enviamos null

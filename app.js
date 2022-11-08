@@ -5,7 +5,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 //MIDDLEWARES
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.json()); //Middleware para que express pueda leer lo que viene por req.body. El método use se usa para usar middleware
 app.use((req, res, next) => {
   //Aplica para todas las request porque está antes de todas las rutas
@@ -30,5 +33,6 @@ app.use((req, res, next) => {
 //ROUTES
 app.use('/api/v1/tours', tourRouter); //middleware
 app.use('/api/v1/users', userRouter); //middleware
+app.use(express.static(`${__dirname}/public`));
 
 module.exports = app;

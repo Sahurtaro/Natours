@@ -1,19 +1,24 @@
 const Tour = require('./../models/tourModel');
+const APIFeatures = require('./../utils/apiFeatures');
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = 5;
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 //ROUTE HANDLERS
 
 exports.getAllTours = async (req, res) => {
   //La función callback se llama Route Handler
   try {
-    //BUILD QUERY
-    const queryObj = { ...req.query }; //así creamos un objeto con lo que trae el query y no una referencia en memoria
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]); //usamos forEach para no crear un arreglo nuevo. Esto va a borrar todos los excluidos de mi queryObj, así no pasan al método find()
-
-    const query = Tour.find(queryObj); //lo llamamos como query sin el await para poder encadenar métodos como sort, limit, y otros, con await no se puede
-
     //EXECUTE THE QUERY
-    const tours = await query; //esto va a devolver una promesa, por eso usamos await
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query; //esto va a devolver una promesa, por eso usamos await
 
     //SEND RESPONSE
     res.status(200).json({
@@ -66,6 +71,14 @@ exports.deleteTour = async (req, res) => {
     res
       .status(204) //204 significa "no content"
       .json({ status: 'success', data: null }); // ya no enviamos datos sino que enviamos null
+  } catch (err) {
+    res.status(404).json({ status: 'fail', message: err });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = Tour.aggregate([]);
   } catch (err) {
     res.status(404).json({ status: 'fail', message: err });
   }

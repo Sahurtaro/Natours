@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true, //solo funciona para strings y remueve todos los espacios en blanco al inicio y al final del string
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -60,6 +62,19 @@ tourSchema.virtual('durationWeeks').get(function () {
   //los virtuals no se pueden usar en query, porque no son parte de la base de datos realmente
   return this.duration / 7;
 });
+
+//DOCUMENT MIDDLEWARE: runs before the .save() command or on the .create() command only.
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+// tourSchema.pre('save', function (next) {
+//   console.log('Will save document...');
+//   next();
+// });
+
+// tourSchema.post('save', function (doc, next) {});
 
 const Tour = mongoose.model('Tour', tourSchema);
 

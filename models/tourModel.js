@@ -49,6 +49,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date], //acá aclaro que para esta propiedad quiero un arreglo de fechas
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true }, //cada vez que los datos se muestren como JSON queremos que virtuals sean parte del resultado
@@ -75,6 +79,33 @@ tourSchema.pre('save', function (next) {
 // });
 
 // tourSchema.post('save', function (doc, next) {});
+
+// QUERY MIDDLEWARE
+// tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  //esta expresión regular va a usar todos los strings que empiecen con find, como find y findOne
+  // la palabra clave "find" va a apuntar a la query actual y no al documento actual
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  next();
+});
+
+// tourSchema.pre('findOne', function (next) {
+//   // la palabra clave "find" va a apuntar a la query actual y no al documento actual
+//   this.find({ secretTour: { $ne: true } });
+//   next();
+// });
+
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 

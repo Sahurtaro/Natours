@@ -1,63 +1,44 @@
-const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+
 const app = express();
-app.use(express.json()); //Middleware para que express pueda leer lo que viene por req.body
-// app.get('/', (req, res) => {
-//   res
-//     .status(200)
-//     .json({ message: 'Hello from the server side', app: 'Natours' }); //status 200 para ok
-// }); //definimos la ruta básica
 
-// app.post('/', (req, res) => {
-//   res.send('You can post to this endpoint');
-// });
+//MIDDLEWARES
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`) //se lee los datos que están en el archivo de texto y se transforman a formato JSON
-);
-app.get('/api/v1/tours', (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'success', results: tours.length, data: { tours: tours } });
-}); //La función callback se llama Route Handler
-
-app.get('/api/v1/tours/:id', (req, res) => {
-  console.log(req.params);
-  const id = req.params.id * 1; //transformamos el id que viene por params(que es un string), en un número
-  const tour = tours.find((el) => el.id === id);
-  //   if (id > tours.length) {
-  if (!tour) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  }
-
-  res.status(200).json({ status: 'success', data: { tour } });
-}); //La función callback se llama Route Handler
-
-app.post('/api/v1/tours', (req, res) => {
-  //   console.log(req.body);
-  const newId = tours[tours.length - 1].id + 1; //aquí se crea un índica mayor al índice del último objeto en el archivo
-  const newTour = Object.assign({ id: newId }, req.body); //con esto creamos un nuevo tour combinando el nuevo id creado con la info que viene por el body
-  tours.push(newTour); //agregamos este nuevo objeto al arreglo de tours
-  fs.writeFile(
-    //aquí agregamos el nuevo tour al archivo de texto donde tenemos todos los tours y funciona provicionalmente como base de datos
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({ status: 'success', data: { tour: newTour } }); //Status 201 indica Created
-    }
-  );
+app.use(express.json()); //Middleware para que express pueda leer lo que viene por req.body. El método use se usa para usar middleware
+app.use(express.static(`${__dirname}/public`));
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
 });
 
-app.patch('/api/v1/tours/:id', (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({ status: 'Failed', message: 'Invalid ID' });
-  }
-  res
-    .status(200)
-    .json({ status: 'success', data: { tour: '<Updated tour here...>' } });
+// app.get('/api/v1/tours', getAllTours);
+
+// app.get('/api/v1/tours/:id', getTour); //La función callback se llama Route Handler
+
+// app.post('/api/v1/tours', createTour);
+
+// app.patch('/api/v1/tours/:id', updateTour);
+
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+//ROUTES
+app.use('/api/v1/tours', tourRouter); //middleware
+app.use('/api/v1/users', userRouter); //middleware
+app.all('*', (req, res, next) => {
+  // const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Running on port ${port}...`);
-}); //Así se inicializa el servidor, recibe como parámetros el puerto y un callback
+app.use(globalErrorHandler); //cuando un middleware tiene 4 parámetros express automáticamente lo identifica como un error handler
+
+module.exports = app;

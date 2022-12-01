@@ -22,6 +22,14 @@ mongoose
 //START THE SERVER
 // console.log(process.env);
 const port = 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Running on port ${port}...`);
 }); //Así se inicializa el servidor, recibe como parámetros el puerto y un callback
+
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  console.log('Unhandled rejection! Shutting down...');
+  server.close(() => {
+    process.exit(1); //code 0 stands for success and 1 is for uncaught exception
+  });
+});

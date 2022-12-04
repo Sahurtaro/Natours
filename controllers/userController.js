@@ -1,9 +1,18 @@
+const User = require('./../models/userModel');
+
+const catchAsync = require('./../utils/catchAsync');
+
 //ROUTE HANDLERS
-exports.getAllUsers = (req, res) => {
-  res
-    .status(500) //500 significa internal server error
-    .json({ status: 'error', message: 'This route is not yet defined' });
-};
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find(); //esto va a devolver una promesa, por eso usamos await
+
+  //SEND RESPONSE
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: { users: users },
+  });
+});
 exports.createUser = (req, res) => {
   res
     .status(500)

@@ -61,14 +61,14 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promosify(jwt.verify)(token, process.env.JWT_SECRET);
 
   //3) Check if user still exists
-  const freshUser = await User.findById(decoded.id); //verificamos que el usuario aún exista después de generado el token
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id); //verificamos que el usuario aún exista después de generado el token
+  if (!currentUser) {
     return next(
       AppError('The user belonging to this token does no longer exists', 401)
     );
   }
   //4) Check if user changed password after the token was issued
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please login again', 401)
     );
@@ -76,6 +76,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // GRANT ACCESS TO PROTECTED ROUTE
 
-  req.user = freshUser;
+  req.user = currentUser;
   next();
 });

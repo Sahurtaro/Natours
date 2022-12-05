@@ -58,7 +58,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   //2) Token verification
-  const decoded = await promosify(jwt.verify)(token, process.env.JWT_SECRET);
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   //3) Check if user still exists
   const currentUser = await User.findById(decoded.id); //verificamos que el usuario aún exista después de generado el token

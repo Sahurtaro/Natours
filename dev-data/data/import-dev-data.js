@@ -21,9 +21,7 @@ mongoose
   });
 
 //READ JSON FILE
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-); //convertimos los datos que vienen en formato json a un objeto de javascript, para que mongoose pueda crear los documentos
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8')); //convertimos los datos que vienen en formato json a un objeto de javascript, para que mongoose pueda crear los documentos
 //IMPORT DATA INTO DATABASE
 const importData = async () => {
   try {

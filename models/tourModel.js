@@ -103,7 +103,7 @@ const tourSchema = new mongoose.Schema(
     ],
     guides: [
       {
-        type: moongoose.Schema.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'User',
       },
     ],
@@ -147,6 +147,14 @@ tourSchema.pre(/^find/, function (next) {
   // la palabra clave "find" va a apuntar a la query actual y no al documento actual
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt -passwordResetExpires -passwordResetToken',
+  });
   next();
 });
 

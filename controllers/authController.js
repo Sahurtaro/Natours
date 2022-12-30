@@ -16,7 +16,7 @@ const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE__EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     // secure: true,
     httpOnly: true,
@@ -81,7 +81,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(decoded.id); //verificamos que el usuario aún exista después de generado el token
   if (!currentUser) {
     return next(
-      AppError('The user belonging to this token does no longer exists', 401)
+      new AppError(
+        'The user belonging to this token does no longer exists',
+        401
+      )
     );
   }
   //4) Check if user changed password after the token was issued

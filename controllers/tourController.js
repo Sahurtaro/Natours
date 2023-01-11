@@ -2,6 +2,8 @@ const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const factory = require('./handlerFactory');
+
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = 5;
   req.query.sort = '-ratingAverage,price';
@@ -68,15 +70,17 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({ status: 'success', data: { tour: tour } });
 });
-exports.deleteTour = catchAsync(async (req, res) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404)); //ponemos return para que se corte la ejecución
-  }
-  res
-    .status(204) //204 significa "no content"
-    .json({ status: 'success', data: null }); // ya no enviamos datos sino que enviamos null
-});
+
+exports.deleteTour = factory.deleteOne(Tour);
+// exports.deleteTour = catchAsync(async (req, res) => {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
+//   if (!tour) {
+//     return next(new AppError('No tour found with that ID', 404)); //ponemos return para que se corte la ejecución
+//   }
+//   res
+//     .status(204) //204 significa "no content"
+//     .json({ status: 'success', data: null }); // ya no enviamos datos sino que enviamos null
+// });
 
 exports.getTourStats = catchAsync(async (req, res) => {
   const stats = await Tour.aggregate([

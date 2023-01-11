@@ -52,24 +52,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
 //   };
 // };
 
-exports.createTour = catchAsync(async (req, res) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    status: 'success',
-    data: { tour: newTour },
-  });
-});
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    //el segundo parámetro es la información con la que queremos cambiar el tour
-    new: true, //el tercer parámetro indica que queremos devolver el documento modíficado en vez del original
-    runValidators: true,
-  });
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404)); //ponemos return para que se corte la ejecución
-  }
-  res.status(200).json({ status: 'success', data: { tour: tour } });
-});
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
 
 exports.deleteTour = factory.deleteOne(Tour);
 // exports.deleteTour = catchAsync(async (req, res) => {

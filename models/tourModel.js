@@ -116,6 +116,10 @@ const tourSchema = new mongoose.Schema(
 
 //Virtual features are fields that we can define in our schema but will not be persisted or not be saved
 
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 tourSchema.virtual('durationWeeks').get(function () {
   //los virtuals no se pueden usar en query, porque no son parte de la base de datos realmente
   return this.duration / 7;
@@ -124,7 +128,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 //Virtual populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
-  foreignField: 'Tour',
+  foreignField: 'tour',
   localField: '_id',
 });
 

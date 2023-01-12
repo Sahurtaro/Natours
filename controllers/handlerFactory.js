@@ -64,7 +64,7 @@ exports.getAll = (Model) =>
       .sort()
       .limitFields()
       .paginate();
-    const doc = await features.query; //esto va a devolver una promesa, por eso usamos await
+    const doc = await features.query.explain(); //esto va a devolver una promesa, por eso usamos await
 
     //SEND RESPONSE
     res.status(200).json({

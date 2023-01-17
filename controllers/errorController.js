@@ -25,7 +25,7 @@ const handleJWTExpiredError = () =>
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
-    statuss: err.status,
+    status: err.status,
     error: err,
     message: err.message,
     stack: err.stack,
@@ -36,7 +36,7 @@ const sendErrorProd = (err, res) => {
   // Operational, trusted errors: send message to client
   if (err.isOperational) {
     res.status(err.statusCode).json({
-      statuss: err.status,
+      status: err.status,
       message: err.message,
     });
     //Programming or other unkown error: don't want to leak the details to the client

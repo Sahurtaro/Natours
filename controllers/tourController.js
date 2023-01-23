@@ -2,6 +2,30 @@ const Tour = require('./../models/tourModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('./../utils/appError');
+const sharp = require('sharp');
+const multer = require('multer');
+
+const multerStorage = multer.memoryStorage(); //con esto guardamos la imagen en la memoria y no en el disco
+
+const multerFilter = (req, file, cb) => {
+  //acá nmos cercioramos que el archivo que se sube sea efectivamente una imagen
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image, please upload only images,', 400), false);
+  }
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter }); //here we gonna save the images we'll upload
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = (req, res, next) => {
+  console.log(req.files);
+  next();
+};
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = 5;

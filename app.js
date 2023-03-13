@@ -6,7 +6,8 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-const cors = require('cors');
+const cookieParser = require('cookie-parser');
+// const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -43,7 +44,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 //Body parser, reading data from the body into req.body
 app.use(express.json({ limit: '10kb' })); //Middleware para que express pueda leer lo que viene por req.body. El método use se usa para usar middleware
-
+app.use(cookieParser());
 //Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -67,6 +68,8 @@ app.use(
 //Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
+
   next();
 });
 

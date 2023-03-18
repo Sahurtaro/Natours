@@ -27,8 +27,8 @@ app.set('views', path.join(__dirname, 'views'));
 // app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
 //Set security http headers
-app.use(helmet());
 // app.use(cors());
+app.use(helmet());
 
 //Development loggin
 if (process.env.NODE_ENV === 'development') {
@@ -44,6 +44,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 //Body parser, reading data from the body into req.body
 app.use(express.json({ limit: '10kb' })); //Middleware para que express pueda leer lo que viene por req.body. El método use se usa para usar middleware
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 //Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());

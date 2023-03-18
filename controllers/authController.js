@@ -28,17 +28,48 @@ const createSendToken = (user, statusCode, res) => {
 
   res.status(statusCode).json({ status: 'success', token, data: { user } });
 };
-
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
+    photo: req.body.photo,
+    location: req.body.location,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt,
+    passwordResetToken: req.body.passwordResetToken,
+    passwordResetExpires: req.body.passwordResetExpires,
     role: req.body.role,
+    active: req.body.active,
   });
-  createSendToken(newUser, 201, res); //status 201 for created
+
+  createSendToken(newUser, 201, res);
 });
+
+// exports.signup = catchAsync(async (req, res, next) => {
+//   const newUser = await User.create({
+//     name: req.body.name,
+//     email: req.body.email,
+//     password: req.body.password,
+//     passwordConfirm: req.body.passwordConfirm,
+//     role: req.body.role,
+//   });
+//   createSendToken(newUser, 201, res); //status 201 for created
+// });
+// exports.signup = catchAsync(async (req, res, next) => {
+//   const newUser = await User.create({
+//     name: req.body.name,
+//     email: req.body.email,
+//     password: req.body.password,
+//     passwordConfirm: req.body.passwordConfirm,
+//     passwordChangedAt: req.body.passwordChangedAt,
+//     role: req.body.role,
+//   });
+//   const url = `${req.protocol}://${req.get('host')}/me`;
+//   await new Email(newUser, url).sendWelcome();
+
+//   createSendToken(newUser, 201, req, res);
+// });
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;

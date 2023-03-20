@@ -37,22 +37,20 @@ router
 
 router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
-router
-  .route('/')
-  .get(tourController.getAllTours)
-  .post(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.uploadTourImages,
-    tourController.resizeTourImages,
-    tourController.createTour
-  ); //Refactoring routes
+router.route('/').get(tourController.getAllTours).post(
+  authController.protect,
+  authController.restrictTo('admin', 'lead-guide'),
+
+  tourController.createTour
+); //Refactoring routes
 router
   .route('/:id')
   .get(tourController.getTour)
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
+    tourController.uploadTourImages,
+    tourController.resizeTourImages,
     tourController.updateTour
   )
   .delete(

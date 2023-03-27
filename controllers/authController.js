@@ -43,7 +43,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     active: req.body.active,
   });
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
+  // console.log(url);
 
   await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
@@ -87,7 +87,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
-  console.log(token);
+  // console.log(token);
   if (!token) {
     return next(
       new AppError('You are not logged in! Please log in to get access', 401) //401 means unauthorized
